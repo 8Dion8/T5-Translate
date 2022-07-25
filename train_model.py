@@ -11,7 +11,8 @@ import numpy as np
 
 
 
-logging.basicConfig(format='[%(asctime)s] - %(message)]', datefmt='%H:%M:%S')
+logging.basicConfig(format='[%(asctime)s] - %(message)s', datefmt='%H:%M:%S')
+logging.root.setLevel(logging.NOTSET)
 
 logging.info("Loading dataset")
 
@@ -25,7 +26,7 @@ pairs = list(zip(input_df, target_df))
 
 logging.info("Loading raw T5 model")
 
-raw_model_name = 't5-base'
+raw_model_name = 'translate_eng-ru_model'
 
 model = T5ForConditionalGeneration.from_pretrained(raw_model_name).cuda()
 tokenizer = T5Tokenizer.from_pretrained(raw_model_name)
@@ -33,9 +34,9 @@ optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
 
 model.train()
 
-batch_size = 128
+batch_size = 8
 report_steps = 100
-epochs = 1
+epochs = 10
 
 logging.info("Starting training")
 
@@ -69,7 +70,7 @@ for epoch in range(epochs):
         losses.append(loss.item())
 
         if i % report_steps == 0:
-            logging.info('step', i, 'loss', np.mean(losses[-report_steps:]))
+            print('step', i, 'loss', np.mean(losses[-report_steps:]))
 
 logging.info("Finished training, saving model")
 
